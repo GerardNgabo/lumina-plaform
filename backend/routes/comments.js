@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { getDb, saveDb } = require("../db");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 // Add comment (protected)
 router.post("/", auth, (req, res) => {
@@ -45,6 +46,18 @@ router.get("/:post_id", (req, res) => {
       return obj;
     });
     res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Delete comment (admin only)
+router.delete("/:id", auth, admin, (req, res) => {
+  try {
+    const db = getDb();
+    db.run("DELETE FROM comments WHERE id = ?", [req.params.id]);
+    saveDb();
+    res.json({ success: true, message: "Comment deleted" });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

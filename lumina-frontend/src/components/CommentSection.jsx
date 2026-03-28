@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { jsonFetch, API_BASE } from '../api/client';
+import { jsonFetch, authFetch, API_BASE } from '../api/client';
 import styles from '../styles/CommentSection.module.css';
 
-export default function CommentSection({ postId }) {
+export default function CommentSection({ postId, isAdmin }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState('');
 
@@ -33,6 +33,13 @@ export default function CommentSection({ postId }) {
     } catch {}
   }
 
+  async function handleDelete(commentId) {
+    try {
+      const res = await authFetch(`${API_BASE}/comments/${commentId}`, { method: 'DELETE' });
+      if (res.ok) loadComments();
+    } catch {}
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.list}>
@@ -41,8 +48,15 @@ export default function CommentSection({ postId }) {
         ) : (
           comments.map((c) => (
             <div key={c.id} className={styles.comment}>
-              <span className={styles.commentAuthor}>{c.user_name}:</span>
-              <span className={styles.commentText}>{c.comment}</span>
+              <div className={styles.commentContent}>
+                <span className={styles.commentAuthor}>{c.user_name}:</span>
+                <span className={styles.commentText}>{c.comment}</span>
+              </div>
+              {isAdmin && (
+                <button className={styles.deleteComment} onClick={() => handleDelete(c.id)}>
+                  &#x2715;
+                </button>
+              )}
             </div>
           ))
         )}

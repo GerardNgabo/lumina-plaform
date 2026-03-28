@@ -1,18 +1,32 @@
 import { useState } from 'react';
-import { SERVER_URL } from '../api/client';
+import { useAuth } from '../context/AuthContext';
+import { SERVER_URL, authFetch, API_BASE } from '../api/client';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import styles from '../styles/PostCard.module.css';
 
-export default function PostCard({ post }) {
+export default function PostCard({ post, onDelete }) {
   const [showComments, setShowComments] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  const { isAdmin } = useAuth();
 
   const isAnon = post.tag && post.tag.includes('ANON');
   const displayName = isAnon ? 'Anonymous Student' : post.author;
   const displayInitials = isAnon ? '?' : (post.author ? post.author[0].toUpperCase() : 'U');
   const cleanTag = post.tag ? post.tag.replace('ANON', '').trim() : '';
-
   const isVideo = post.image_url && /\.(mp4|webm|ogg|mov)$/i.test(post.image_url);
+
+  async function handleDelete() {
+    try {
+      const res = await authFetch(`${API_BASE}/posts/${post.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setDeleted(true);
+        onDelete?.();
+      }
+    } catch {}
+  }
+
+  if (deleted) return null;
 
   return (
     <div className={styles.post}>
@@ -21,12 +35,20 @@ export default function PostCard({ post }) {
         <div className={styles.info}>
           <div className={styles.nameRow}>
             <span className={styles.name}>{displayName}</span>
+            {post.author_role === 'admin' && !isAnon && (
+              <span className={styles.adminBadge}>ADMIN</span>
+            )}
             {cleanTag && <span className={styles.tag}>#{cleanTag}</span>}
           </div>
           <div className={styles.timestamp}>
             {new Date(post.created_at).toLocaleDateString()}
           </div>
         </div>
+        {isAdmin && (
+          <button className={styles.deleteBtn} onClick={handleDelete} title="Delete post">
+            &#x2715;
+          </button>
+        )}
       </div>
 
       {post.content && <p className={styles.content}>{post.content}</p>}
@@ -53,7 +75,7 @@ export default function PostCard({ post }) {
         </button>
       </div>
 
-      {showComments && <CommentSection postId={post.id} />}
+      {showComments && <CommentSection postId={post.id} isAdmin={isAdmin} />}
     </div>
   );
 }

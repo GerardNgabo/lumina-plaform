@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getDb, saveDb } = require("../db");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "change_this_secret";
@@ -53,7 +54,7 @@ router.post("/login", async (req, res) => {
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = jwt.sign(
-      { userId: user.id, name: user.name, email: user.email },
+      { userId: user.id, name: user.name, email: user.email, role: user.role || "user" },
       JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -61,7 +62,7 @@ router.post("/login", async (req, res) => {
     res.json({
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role || "user" }
     });
   } catch (e) {
     res.status(500).json({ error: e.message || "Login failed" });
@@ -79,6 +80,67 @@ router.put("/update", auth, (req, res) => {
     db.run("UPDATE users SET name = ? WHERE id = ?", [displayName, req.user.userId]);
     saveDb();
     res.json({ success: true, newName: displayName });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ==================== ADMIN ROUTES ====================
+
+// Get all users (admin only)
+router.get("/users", auth, admin, (req, res) => {
+  try {
+    const db = getDb();
+    const result = db.exec("SELECT id, name, email, role, profile_pic FROM users ORDER BY id ASC");
+    if (result.length === 0) return res.json([]);
+
+    const cols = result[0].columns;
+    const rows = result[0].values.map(row => {
+      const obj = {};
+      cols.forEach((col, i) => { obj[col] = row[i]; });
+      return obj;
+    });
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Update user role (admin only)
+router.put("/users/:id/role", auth, admin, (req, res) => {
+  const { role } = req.body;
+  const userId = req.params.id;
+
+  if (!role || !["user", "admin"].includes(role)) {
+    return res.status(400).json({ error: "Role must be 'user' or 'admin'" });
+  }
+
+  try {
+    const db = getDb();
+    db.run("UPDATE users SET role = ? WHERE id = ?", [role, parseInt(userId)]);
+    saveDb();
+    res.json({ success: true, userId: parseInt(userId), role });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Delete user (admin only)
+router.delete("/users/:id", auth, admin, (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  if (userId === req.user.userId) {
+    return res.status(400).json({ error: "Cannot delete yourself" });
+  }
+
+  try {
+    const db = getDb();
+    db.run("DELETE FROM comments WHERE user_id = ?", [userId]);
+    db.run("DELETE FROM likes WHERE user_id = ?", [userId]);
+    db.run("DELETE FROM posts WHERE user_id = ?", [userId]);
+    db.run("DELETE FROM users WHERE id = ?", [userId]);
+    saveDb();
+    res.json({ success: true, message: "User deleted" });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

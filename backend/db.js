@@ -21,7 +21,8 @@ async function initDb() {
     name TEXT,
     email TEXT UNIQUE,
     password TEXT,
-    profile_pic TEXT
+    profile_pic TEXT,
+    role TEXT DEFAULT 'user'
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS posts (

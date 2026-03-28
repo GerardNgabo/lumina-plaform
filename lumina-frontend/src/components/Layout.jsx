@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import styles from '../styles/Layout.module.css';
 
 export default function Layout() {
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -15,6 +15,7 @@ export default function Layout() {
     { to: '/', icon: '\u2302', label: 'Home' },
     { to: '/dashboard', icon: '\u2261', label: 'Dashboard' },
     { to: '/profile', icon: '\u263A', label: 'Profile' },
+    ...(isAdmin ? [{ to: '/admin', icon: '\u2699', label: 'Admin' }] : []),
   ];
 
   return (

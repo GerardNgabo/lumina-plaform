@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { getDb, saveDb } = require("../db");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 const multer = require("multer");
 const path = require("path");
 
@@ -19,7 +20,7 @@ router.get("/", (req, res) => {
   try {
     const db = getDb();
     const result = db.exec(`
-      SELECT p.*, u.name as author, u.profile_pic
+      SELECT p.*, u.name as author, u.profile_pic, u.role as author_role
       FROM posts p
       LEFT JOIN users u ON p.user_id = u.id
       ORDER BY p.id DESC
@@ -94,6 +95,21 @@ router.get("/:postId/likes", (req, res) => {
     res.json({ count });
   } catch (e) {
     res.json({ count: 0 });
+  }
+});
+
+// 5. Delete Post (admin only)
+router.delete("/:postId", auth, admin, (req, res) => {
+  const postId = req.params.postId;
+  try {
+    const db = getDb();
+    db.run("DELETE FROM comments WHERE post_id = ?", [postId]);
+    db.run("DELETE FROM likes WHERE post_id = ?", [postId]);
+    db.run("DELETE FROM posts WHERE id = ?", [postId]);
+    saveDb();
+    res.json({ success: true, message: "Post deleted" });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
