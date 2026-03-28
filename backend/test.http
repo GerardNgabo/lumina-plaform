@@ -1,0 +1,43 @@
+
+### 0) Paste your token here after logging in
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsIm5hbWUiOiJpdm8iLCJlbWFpbCI6ImdhbnphaXZvMUBnbWFpbC5jb20iLCJpYXQiOjE3NjM2NDkzOTksImV4cCI6MTc2MzY1NjU5OX0.vvDPjCMNv-pMUOK9_HNAyt55WSoYokIygZd5E5sYb0M
+
+### Test unauthorized POST (should fail with 401)
+POST http://localhost:5001/api/posts
+Content-Type: application/json
+
+{
+  "content": "Unauthorized test",
+  "tag": "REB"
+}
+
+
+# ### 1) Unauthorized create post (expect 401)
+# POST http://localhost:5001/api/posts
+# Content-Type: application/json
+
+# {
+#   "content": "Unauthorized test",
+#   "tag": "REB"
+# }
+
+
+### 2) Login to get JWT token
+POST http://localhost:5001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ganzaivo1@gmail.com",
+  "password": "test123"
+}
+
+
+### 3) Authorized create post (expect 200)
+POST http://localhost:5001/api/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Authorized test post",
+  "tag": "REB"
+}

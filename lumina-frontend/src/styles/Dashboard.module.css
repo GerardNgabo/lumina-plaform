@@ -1,0 +1,112 @@
+.header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-solid);
+  font-size: 18px;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  background: rgba(12, 12, 12, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.content {
+  padding: 20px;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.statLabel {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.chartSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.chartTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.chartWrapper {
+  height: 300px;
+  position: relative;
+}
+
+.trendingSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.trendingTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.trendingList {
+  display: flex;
+  flex-direction: column;
+}
+
+.trendingItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.trendingItem:last-child {
+  border-bottom: none;
+}
+
+.trendingTag {
+  font-weight: 600;
+  color: var(--accent-light);
+}
+
+.trendingCount {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 600px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}

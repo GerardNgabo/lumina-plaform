@@ -1,0 +1,121 @@
+.header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-solid);
+  font-size: 18px;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  background: rgba(12, 12, 12, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.profileCard {
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.email {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.editBtn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-solid);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  border-color: var(--accent);
+}
+
+.editForm {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.editInput {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-solid);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.editInput:focus {
+  border-color: var(--accent);
+}
+
+.saveBtn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border-solid);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sectionTitle {
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+}
