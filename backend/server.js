@@ -2,13 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
+const { initDb } = require("./db");
 
 const app = express();
 
-// 1. CORS CONFIGURATION (Crucial for Netlify)
-// This tells the browser: "Yes, netlify.app is allowed to talk to me."
 app.use(cors({
-    origin: "*", // Allow any frontend to connect (Easiest for now)
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
@@ -16,8 +15,14 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use("/uploads", express.static("uploads"));
 
-// 2. Import Routes
-try {
+app.get("/", (req, res) => {
+  res.send("Lumina Backend is Live!");
+});
+
+const PORT = process.env.PORT || 5005;
+
+initDb().then(() => {
+  try {
     const authRoutes = require("./routes/auth");
     const postRoutes = require("./routes/posts");
     const commentRoutes = require("./routes/comments");
@@ -25,22 +30,16 @@ try {
     app.use("/api/auth", authRoutes);
     app.use("/api/posts", postRoutes);
     app.use("/api/comments", commentRoutes);
-    
+
     console.log("[SERVER] Routes mounted successfully.");
-} catch (error) {
+  } catch (error) {
     console.error("[SERVER] Error mounting routes:", error.message);
-}
+  }
 
-// 3. Root Route
-app.get("/", (req, res) => {
-  res.send("Lumina Backend is Live!");
+  app.listen(PORT, () => {
+    console.log(`\n✅ SERVER STARTED on Port ${PORT}`);
+  });
+}).catch((err) => {
+  console.error("Failed to initialize database:", err);
+  process.exit(1);
 });
-
-// 4. DYNAMIC PORT SETTING (The Fix)
-// process.env.PORT is what Render uses. 5005 is what you use locally.
-const PORT = process.env.PORT || 5005; 
-
-app.listen(PORT, () => {
-  console.log(`\n✅ SERVER STARTED on Port ${PORT}`);
-});
-

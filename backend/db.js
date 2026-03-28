@@ -1,10 +1,21 @@
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("./lumina.db", (err) => {
-  if (err) console.error("Database connection error:", err);
-  else console.log("Connected to SQLite database.");
-});
+const initSqlJs = require("sql.js");
+const fs = require("fs");
+const path = require("path");
 
-db.serialize(() => {
+const DB_PATH = path.join(__dirname, "lumina.db");
+
+let db;
+
+async function initDb() {
+  const SQL = await initSqlJs();
+
+  if (fs.existsSync(DB_PATH)) {
+    const buffer = fs.readFileSync(DB_PATH);
+    db = new SQL.Database(buffer);
+  } else {
+    db = new SQL.Database();
+  }
+
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -35,6 +46,22 @@ db.serialize(() => {
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
-});
 
-module.exports = db;
+  saveDb();
+  console.log("Connected to SQLite database.");
+  return db;
+}
+
+function saveDb() {
+  if (db) {
+    const data = db.export();
+    const buffer = Buffer.from(data);
+    fs.writeFileSync(DB_PATH, buffer);
+  }
+}
+
+function getDb() {
+  return db;
+}
+
+module.exports = { initDb, getDb, saveDb };
