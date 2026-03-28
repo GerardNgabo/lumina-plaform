@@ -1,4 +1,5 @@
 const initSqlJs = require("sql.js");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
@@ -47,6 +48,18 @@ async function initDb() {
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+
+  // Seed default admin if no users exist
+  const users = db.exec("SELECT COUNT(*) as count FROM users");
+  const userCount = users[0].values[0][0];
+  if (userCount === 0) {
+    const hash = bcrypt.hashSync("admin123", 10);
+    db.run(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      ["Admin", "admin@lumina.dev", hash, "admin"]
+    );
+    console.log("Default admin created: admin@lumina.dev / admin123");
+  }
 
   saveDb();
   console.log("Connected to SQLite database.");
