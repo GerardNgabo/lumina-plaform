@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5005/api';
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5005';
+const SERVER_URL = API_BASE.replace(/\/api$/, '');
 
 export { API_BASE, SERVER_URL };
 
